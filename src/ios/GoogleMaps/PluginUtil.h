@@ -26,6 +26,11 @@ typedef void (^MYCompletionHandler)(NSError *error);
 #define SWITCH(s) for (NSString *__s__ = (s); __s__; __s__ = nil)
 #define DEFAULT
 
+#define UIColorFromRGB(rgbValue) [UIColor \
+    colorWithRed:((float)((rgbValue & 0xFF0000) >> 16))/255.0 \
+    green:((float)((rgbValue & 0xFF00) >> 8))/255.0 \
+    blue:((float)(rgbValue & 0xFF))/255.0 alpha:1.0]
+
 @interface UIView (GoogleMapsPlugin)
 - (void)setFrameWithDictionary:(NSDictionary *) params;
 - (void)setFrameWithInt:(int)left top:(int)top width:(int)width height:(int)height;

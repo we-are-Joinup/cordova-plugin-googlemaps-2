@@ -1388,7 +1388,14 @@
 
 
   if ([labelOptions objectForKey:@"color"]) {
-    textColor = [[labelOptions objectForKey:@"color"] parsePluginColor];
+    if ( [[labelOptions objectForKey:@"color"] isKindOfClass:[NSString class]]) {
+      NSString* hex = [[labelOptions objectForKey:@"color"] stringByReplacingOccurrencesOfString:@"#" withString:@""];
+      unsigned colorInt = 0;
+      [[NSScanner scannerWithString:hex] scanHexInt:&colorInt];
+      textColor = UIColorFromRGB(colorInt);
+    } else {
+      textColor = [[labelOptions objectForKey:@"color"] parsePluginColor];
+    }
   }
 
   // Calculate the size for the title strings

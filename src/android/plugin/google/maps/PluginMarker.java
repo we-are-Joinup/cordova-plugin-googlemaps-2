@@ -1229,7 +1229,10 @@ public class PluginMarker extends MyPlugin implements MyPluginInterface {
 
     int color = Color.BLACK;
     if (labelOptions.containsKey("color")) {
-      color = labelOptions.getInt("color");
+      color = labelOptions.getInt("color", -1);
+      if(color == -1 && labelOptions.getString("color", "") != "") {
+        color = Color.parseColor(labelOptions.getString("color"));
+      }
     }
     boolean bold = false;
     if (labelOptions.containsKey("bold")) {
