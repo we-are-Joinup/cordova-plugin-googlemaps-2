@@ -62,6 +62,19 @@ var MarkerCluster = function (map, markerClusterOptions, _exec) {
     value: markerClusterOptions.boundsDraw === true,
     writable: false
   });
+  Object.defineProperty(self, 'sumLabels', {
+    value: markerClusterOptions.sumLabels,
+    writable: false
+  });
+  Object.defineProperty(self, 'getIcon', {
+    value: markerClusterOptions.getIcon,
+    writable: false
+  });
+  // Callback to receive event and if return true will stop the zoomed
+  Object.defineProperty(self, 'clickCluster', {
+    value: markerClusterOptions.clickCluster,
+    writable: false
+  });
 
   if (self.boundsDraw) {
     self.map.addPolygon({
@@ -243,6 +256,9 @@ MarkerCluster.prototype.onClusterClicked = function (cluster) {
     return null;
   }
   var self = this;
+  if (self.clickCluster && self.clickCluster(cluster)) {
+    return null;
+  }
   var polygon = self.get('polygon');
   var bounds = cluster.getBounds();
   if (self.boundsDraw) {
@@ -261,7 +277,7 @@ MarkerCluster.prototype.onClusterClicked = function (cluster) {
     polygon.setVisible(true);
   }
   var zoomLevel = computeZoom(cluster.getBounds(), self.map.getDiv());
-  zoomLevel += zoomLevel === self.map.get('camera_zoom') ? 1 : 0;
+  zoomLevel += ((zoomLevel - self.map.get('camera_zoom')) < 1.5) ? 1 : 0;
   self.map.animateCamera({
     target: cluster.getBounds().getCenter(),
     zoom: zoomLevel,
@@ -1003,10 +1019,22 @@ Object.defineProperty(MarkerCluster.prototype, '_redraw', {
         }
 
         unionedMarkers.forEach(function (cluster) {
-
-          var icon = self.getClusterIcon(cluster),
+          var countCluster = 0;
+          if (self.sumLabels) {
+            cluster._markerArray.forEach(function (marker) {
+              var data = marker.get('data');
+              if (data) {
+                countCluster = countCluster + self.getClusterLabelData(data, self.sumLabels);
+              } else {
+                countCluster = countCluster + 1;
+              }
+            });
+          } else {
+            countCluster = cluster.getItemLength();
+          }
+          var icon = self.getIcon ? self.getIcon(cluster) : self.getClusterIcon(cluster),
             clusterOpts = {
-              'count': cluster.getItemLength(),
+              'count': countCluster,
               'position': cluster.getBounds().getCenter(),
               '__pgmId': cluster.getId()
             };
@@ -1146,6 +1174,12 @@ Object.defineProperty(MarkerCluster.prototype, '_redraw', {
     //               });
   }
 });
+
+MarkerCluster.prototype.getClusterLabelData = function (data, key) {
+  var arr = key.split(".");
+  while(arr.length && (data = data[arr.shift()]));
+  return data;
+};
 
 MarkerCluster.prototype.getClusterIcon = function (cluster) {
   var self = this,
