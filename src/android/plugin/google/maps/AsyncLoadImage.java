@@ -140,30 +140,6 @@ public class AsyncLoadImage extends AsyncTask<Void, Void, AsyncLoadImage.AsyncLo
     //View browserView = webView.getView();
     //String browserViewName = browserView.getClass().getName();
     this.userAgent = "Mozilla";
-
-    /*
-    if("org.xwalk.core.XWalkView".equals(browserViewName) ||
-        "org.crosswalk.engine.XWalkCordovaView".equals(browserViewName)) {
-
-      CordovaPreferences preferences = webView.getPreferences();
-      // Set xwalk webview settings by Cordova preferences.
-      String xwalkUserAgent = preferences == null ? "" : preferences.getString("xwalkUserAgent", "");
-      if (!xwalkUserAgent.isEmpty()) {
-        this.userAgent = xwalkUserAgent;
-      }
-
-      String appendUserAgent = preferences.getString("AppendUserAgent", "");
-      if (!appendUserAgent.isEmpty()) {
-        this.userAgent = this.userAgent + " " + appendUserAgent;
-      }
-      if ("".equals(this.userAgent)) {
-        this.userAgent = "Mozilla";
-      }
-    } else {
-      this.userAgent = ((WebView) webView.getEngine().getView()).getSettings().getUserAgentString();
-    }
-    */
-
   }
 
   protected AsyncLoadImageResult doInBackground(Void... params) {
@@ -196,11 +172,10 @@ public class AsyncLoadImage extends AsyncTask<Void, Void, AsyncLoadImage.AsyncLo
     //--------------------------------
     if (!iconUrl.startsWith("data:image")) {
 
-      if (iconUrl.startsWith("http://localhost") ||
-          iconUrl.startsWith("http://127.0.0.1")) {
+       if ( currentPageUrl.matches("https?://(localhost|127.0.0.1)/(.)*") ) {
 //        Log.d(TAG, String.format("---->(201)iconURL = %s", iconUrl));
         if (iconUrl.contains("://")) {
-          iconUrl = iconUrl.replaceAll("http://.+?/", "file:///android_asset/www/");
+          iconUrl = iconUrl.replaceAll("https?://.+?/", "file:///android_asset/www/");
         } else {
           // Avoid WebViewLocalServer (because can not make a connection for some reason)
           iconUrl = "file:///android_asset/www/".concat(iconUrl);
@@ -455,107 +430,6 @@ public class AsyncLoadImage extends AsyncTask<Void, Void, AsyncLoadImage.AsyncLo
           return null;
         }
       }
-      /*
-      //--------------------------------
-      // Load image from local path
-      //--------------------------------
-      if (!iconUrl.contains("://") &&
-          !iconUrl.startsWith("/") &&
-          !iconUrl.startsWith("www/") &&
-          !iconUrl.startsWith("data:image") &&
-          !iconUrl.startsWith("./") &&
-          !iconUrl.startsWith("../")) {
-        iconUrl = "./" + iconUrl;
-        Log.d(TAG, "--> iconUrl = " + iconUrl);
-      }
-
-      if (iconUrl.startsWith("./") || iconUrl.startsWith("../")) {
-        iconUrl = iconUrl.replace("(\\.\\/)+", "./");
-        String currentPage = this.currentPageUrl;
-        currentPage = currentPage.replaceAll("[^\\/]*$", "");
-        currentPage = currentPage.replaceAll("#.*$", "");
-        currentPage = currentPage.replaceAll("\\/[^\\/]+\\.[^\\/]+$", "");
-        if (!currentPage.endsWith("/")) {
-          currentPage = currentPage + "/";
-        }
-        iconUrl = currentPage + iconUrl;
-        iconUrl = iconUrl.replaceAll("(\\/\\.\\/+)+", "/");
-        Log.d(TAG, "--> iconUrl = " + iconUrl);
-      }
-
-      if (iconUrl.indexOf("data:image/") == 0 && iconUrl.contains(";base64,")) {
-        cacheKey = getCacheKey(iconUrl, mWidth, mHeight);
-
-        image = getBitmapFromMemCache(cacheKey);
-        if (image != null) {
-          AsyncLoadImageResult result = new AsyncLoadImageResult();
-          result.image = image;
-          result.cacheHit = true;
-          result.cacheKey = cacheKey;
-          return result;
-        }
-
-        String[] tmp = iconUrl.split(",");
-        image = PluginUtil.getBitmapFromBase64encodedImage(tmp[1]);
-      } else if (iconUrl.indexOf("file://") == 0 &&
-          !iconUrl.contains("file:///android_asset/")) {
-        iconUrl = iconUrl.replace("file://", "");
-        File tmp = new File(iconUrl);
-        if (tmp.exists()) {
-          cacheKey = getCacheKey(iconUrl, mWidth, mHeight);
-
-          image = getBitmapFromMemCache(cacheKey);
-          if (image != null) {
-            AsyncLoadImageResult result = new AsyncLoadImageResult();
-            result.image = image;
-            result.cacheHit = true;
-            result.cacheKey = cacheKey;
-            return result;
-          }
-
-          image = BitmapFactory.decodeFile(iconUrl);
-        } else {
-          //if (PluginMarker.this.mapCtrl.mPluginLayout.isDebug) {
-          Log.w(TAG, "icon is not found (" + iconUrl + ")");
-          //}
-          return null;
-        }
-      } else {
-        Log.d(TAG, "--> iconUrl = " + iconUrl);
-        cacheKey = getCacheKey(iconUrl, mWidth, mHeight);
-        image = getBitmapFromMemCache(cacheKey);
-
-        if (image != null) {
-          AsyncLoadImageResult result = new AsyncLoadImageResult();
-          result.image = image;
-          result.cacheHit = true;
-          result.cacheKey = cacheKey;
-          return result;
-        }
-
-        Log.d(TAG, "iconUrl = " + iconUrl);
-        if (iconUrl.indexOf("file:///android_asset/") == 0) {
-          iconUrl = iconUrl.replace("file:///android_asset/", "");
-        }
-
-        Log.d(TAG, "iconUrl = " + iconUrl);
-        if (iconUrl.contains("./")) {
-          try {
-            boolean isAbsolutePath = iconUrl.startsWith("/");
-            File relativePath = new File(iconUrl);
-            iconUrl = relativePath.getCanonicalPath();
-            Log.d(TAG, "iconUrl = " + iconUrl);
-            if (!isAbsolutePath) {
-              iconUrl = iconUrl.substring(1);
-            }
-            Log.d(TAG, "iconUrl = " + iconUrl);
-          } catch (Exception e) {
-            e.printStackTrace();
-          }
-        }
-        */
-
-      //}
 
       if (mWidth > 0 && mHeight > 0) {
         mWidth = Math.round(mWidth * density);
