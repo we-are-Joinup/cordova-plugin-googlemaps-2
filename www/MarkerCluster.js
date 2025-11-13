@@ -304,7 +304,7 @@ MarkerCluster.prototype.remove = function (callback) {
   }
   if (self.debug) {
     clearInterval(self.debugTimer);
-    self.self.debugTimer = undefined;
+    self.debugTimer = undefined;
   }
 
   if (self._isWorking) {

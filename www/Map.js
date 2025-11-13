@@ -1408,11 +1408,13 @@ Map.prototype.addCircle = function(circleOptions, callback) {
   });
 
   self.exec.call(self, function() {
-    circle._privateInitialize();
-    delete circle._privateInitialize;
+    if (circle) {
+      circle._privateInitialize();
+      delete circle._privateInitialize;
 
-    if (typeof callback === 'function') {
-      callback.call(self, circle);
+      if (typeof callback === 'function') {
+        callback.call(self, circle);
+      }
     }
   }, self.errorHandler, self.__pgmId, 'loadPlugin', ['Circle', circleOptions, circle.hashCode]);
 

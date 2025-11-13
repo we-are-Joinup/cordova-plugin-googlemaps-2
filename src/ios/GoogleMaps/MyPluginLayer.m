@@ -274,10 +274,8 @@
     if (pluginViewCtrl.view.hidden == NO) {
       if (pluginViewCtrl.isRenderedAtOnce == YES ||
           ([pluginViewCtrl.overlayId hasPrefix:@"panorama_"] ||
-            ([pluginViewCtrl.overlayId hasPrefix:@"map_"] &&
-            ((GMSMapView *)pluginViewCtrl.view).mapType != kGMSTypeSatellite &&
-            ((GMSMapView *)pluginViewCtrl.view).mapType != kGMSTypeHybrid)
-          )) {
+            [pluginViewCtrl.overlayId hasPrefix:@"map_"])
+          ) {
 
         if (rect.origin.y + rect.size.height >= offset.y &&
             rect.origin.x + rect.size.width >= offset.x &&
